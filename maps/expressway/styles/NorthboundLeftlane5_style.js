@@ -1,5 +1,5 @@
 var size = 0;
-var ranges_RightlaneSouthbound0 = [[0.000000, 1.000000, [ new ol.style.Style({
+var ranges_NorthboundLeftlane5 = [[0.000000, 1.000000, [ new ol.style.Style({
         stroke: new ol.style.Stroke({color: 'rgba(244,244,244,1.0)', lineDash: null, lineCap: 'butt', lineJoin: 'bevel', width: 15}),
     })]],
 [1.000000, 90.000000, [ new ol.style.Style({
@@ -53,16 +53,16 @@ var ranges_RightlaneSouthbound0 = [[0.000000, 1.000000, [ new ol.style.Style({
 [105.000000, 140.000000, [ new ol.style.Style({
         stroke: new ol.style.Stroke({color: 'rgba(215,25,28,1.0)', lineDash: null, lineCap: 'butt', lineJoin: 'bevel', width: 15}),
     })]]];
-var styleCache_RightlaneSouthbound0={}
-var style_RightlaneSouthbound0 = function(feature, resolution){
+var styleCache_NorthboundLeftlane5={}
+var style_NorthboundLeftlane5 = function(feature, resolution){
     var context = {
         feature: feature,
         variables: {}
     };
     var value = feature.get("CPX level");
-    var style = ranges_RightlaneSouthbound0[0][2];
-    for (i = 0; i < ranges_RightlaneSouthbound0.length; i++){
-        var range = ranges_RightlaneSouthbound0[i];
+    var style = ranges_NorthboundLeftlane5[0][2];
+    for (i = 0; i < ranges_NorthboundLeftlane5.length; i++){
+        var range = ranges_NorthboundLeftlane5[i];
         if (value > range[0] && value<=range[1]){
             style =  range[2];
         }
@@ -77,7 +77,7 @@ var style_RightlaneSouthbound0 = function(feature, resolution){
             labelText = ""
         }
         var key = value + "_" + labelText
-        if (!styleCache_RightlaneSouthbound0[key]){
+        if (!styleCache_NorthboundLeftlane5[key]){
             var text = new ol.style.Text({
                   font: '16.9px \'.SF NS Text\', sans-serif',
                   text: labelText,
@@ -86,7 +86,7 @@ var style_RightlaneSouthbound0 = function(feature, resolution){
                     color: 'rgba(0, 0, 0, 1)'
                   }),
                 });
-            styleCache_RightlaneSouthbound0[key] = new ol.style.Style({"text": text})
+            styleCache_NorthboundLeftlane5[key] = new ol.style.Style({"text": text})
         }
     } else {
         if ("" !== null) {
@@ -95,7 +95,7 @@ var style_RightlaneSouthbound0 = function(feature, resolution){
             labelText = ""
         }
         var key = value + "_" + labelText
-        if (!styleCache_RightlaneSouthbound0[key]){
+        if (!styleCache_NorthboundLeftlane5[key]){
             var text = new ol.style.Text({
                     font: '16.9px \'.SF NS Text\', sans-serif',
                     text: labelText,
@@ -107,10 +107,10 @@ var style_RightlaneSouthbound0 = function(feature, resolution){
                       color: 'rgba(0, 0, 0, 1)'
                     }),
                 });
-            styleCache_RightlaneSouthbound0[key] = new ol.style.Style({"text": text})
+            styleCache_NorthboundLeftlane5[key] = new ol.style.Style({"text": text})
         }
     }
-    var allStyles = [styleCache_RightlaneSouthbound0[key]];
+    var allStyles = [styleCache_NorthboundLeftlane5[key]];
     allStyles.push.apply(allStyles, style);
     return allStyles;
 };
