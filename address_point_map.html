@@ -60,7 +60,11 @@
 	}).addTo(mymap);
 
   var geojsonLayer = new L.GeoJSON.AJAX("address_points.geojson");
-  geojsonLayer.addTo(mymap);
+	var categoryALayer = L.geoJson(yourGeoJson, {
+  	filter: function(feature, layer) {
+    	return (feature.properties.nzs6806_category === "A");
+		}
+	}).addTo(mymap);
 
 </script>
 
