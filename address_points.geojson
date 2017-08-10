@@ -1,0 +1,12 @@
+{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "address": "59 Park Avenue", "nzs6806_category": "B", "complaint_1": 0, "complaint_2": 1, "complaint_3": 0, "predicted": 47.0, "measured": 0 }, "geometry": { "type": "Point", "coordinates": [ 175.044206849923171, -40.871533716522158 ] } },
+{ "type": "Feature", "properties": { "address": "28 Walton Avenue", "nzs6806_category": "A", "complaint_1": 1, "complaint_2": 0, "complaint_3": 1, "predicted": 50.2, "measured": 1 }, "geometry": { "type": "Point", "coordinates": [ 175.043347517209469, -40.872464866796335 ] } },
+{ "type": "Feature", "properties": { "address": "65 Park Avenue", "nzs6806_category": "A", "complaint_1": 0, "complaint_2": 1, "complaint_3": 1, "predicted": 49.3, "measured": 1 }, "geometry": { "type": "Point", "coordinates": [ 175.04503396654448, -40.872199133063582 ] } },
+{ "type": "Feature", "properties": { "address": "16 Walton Avenue", "nzs6806_category": "B", "complaint_1": 0, "complaint_2": 0, "complaint_3": 1, "predicted": 49.8, "measured": 1 }, "geometry": { "type": "Point", "coordinates": [ 175.042875316313854, -40.87344360024867 ] } },
+{ "type": "Feature", "properties": { "address": "89 Park Avenue", "nzs6806_category": "A", "complaint_1": 0, "complaint_2": 1, "complaint_3": 0, "predicted": 52.5, "measured": 0 }, "geometry": { "type": "Point", "coordinates": [ 175.046363999592188, -40.873470999897883 ] } },
+{ "type": "Feature", "properties": { "address": "10 Millvale Street", "nzs6806_category": "B", "complaint_1": 0, "complaint_2": 0, "complaint_3": 1, "predicted": 51.2, "measured": 0 }, "geometry": { "type": "Point", "coordinates": [ 175.0449193000766, -40.873782649818018 ] } }
+]
+}
