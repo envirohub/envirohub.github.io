@@ -81,7 +81,7 @@
 
     var map = L.map('map'),
     realtime = L.realtime(myRequest, {
-        interval: 1 * 1000,
+        interval: 3 * 1000,
         pointToLayer: function (feature, latlng) {
 			return L.circleMarker(latlng, {
 				radius: 14,
