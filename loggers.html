@@ -12,12 +12,10 @@
 
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin=""/>
 	<link rel="stylesheet" type="text/css" href="https://envirohub.github.io/css/leaflet.groupedlayercontrol.min.css" />
-	<link rel="stylesheet" href="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.css" />
 
 	<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
 	<script src="https://envirohub.github.io/js/leaflet-0.7.2/leaflet.ajax.min.js"></script>
 	<script src="https://envirohub.github.io/js/leaflet.groupedlayercontrol.min.js"></script>
-	<script src="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.js"></script>
 	<script src="https://envirohub.github.io/js/leaflet-easyprint.js"></script>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
@@ -26,6 +24,9 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
     <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+
+    <link rel="stylesheet" href="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.css" />
+    <script src="https://ppete2.github.io/Leaflet.PolylineMeasure/Leaflet.PolylineMeasure.js"></script>
 
 	<style>
 	#map {
@@ -74,38 +75,182 @@
 
 	<script>
 
-    var myRequest = new Request('https://script.google.com/macros/s/AKfycbzWYaUGUMwq_chKdiZz43K279LhI4Uc21udxOJr0g0JECVkna4/exec?id=logger-01',
-                                {
-                                    method: 'GET',
-                                });
+    var logger01_request = new Request('https://script.google.com/macros/s/AKfycbzWYaUGUMwq_chKdiZz43K279LhI4Uc21udxOJr0g0JECVkna4/exec',
+                                       {method: 'GET'});
+    var logger02_request = new Request('https://script.google.com/macros/s/AKfycbxw5-H2gOlRZztAw9WnTO6SS-WesH-rAPHN49kn9bJu3UC_4Io/exec',
+                                       {method: 'GET'});
+    var logger03_request = new Request('https://script.google.com/macros/s/AKfycbxB1CJ7OW9LoIRAv1bkLjX6_2InTnpBVTMuQBX12ytxMS3H9cE/exec',
+                                       {method: 'GET'});
 
     var map = L.map('map'),
-    realtime = L.realtime(myRequest, {
+    realtime = L.realtime(logger01_request, {
         interval: 3 * 1000,
+        getFeatureId: function(f) {
+            return f.properties.datetime;
+        },
         pointToLayer: function (feature, latlng) {
 			return L.circleMarker(latlng, {
 				radius: 14,
-				fillColor: "#888",
+				fillColor: getGradientColor('#FF0000', '#00FF00', feature.properties.t1/150),
 				color: "#000",
 				fillOpacity: 1,
-				weight: 1.8
+				weight: 1
 			})
         }
     }).addTo(map);
+
+    L.realtime(logger02_request, {
+        interval: 3 * 1000,
+        getFeatureId: function(f) {
+            return f.properties.datetime;
+        },
+        pointToLayer: function (feature, latlng) {
+			return L.circleMarker(latlng, {
+				radius: 14,
+				fillColor: getGradientColor('#FF0000', '#00FF00', feature.properties.t1/150),
+				color: "#999",
+				fillOpacity: 1,
+				weight: 1
+			})
+        }
+    }).addTo(map);
+
+    L.realtime(logger03_request, {
+        interval: 3 * 1000,
+        getFeatureId: function(f) {
+            return f.properties.datetime;
+        },
+        pointToLayer: function (feature, latlng) {
+			return L.circleMarker(latlng, {
+				radius: 14,
+				fillColor: getGradientColor('#FF0000', '#00FF00', feature.properties.t1/150),
+				color: "#FFF",
+				fillOpacity: 1,
+				weight: 1
+			})
+        }
+    }).addTo(map);
+
+    var locations = {
+        "type": "FeatureCollection",
+        "features": [
+            {"type": "Feature",
+             "geometry": {
+                "coordinates": [172.614662,-43.446155],
+                "type": "Point"},
+             "properties": {"id": "01S-0327-D/5.100"}},
+            {"type": "Feature",
+             "geometry": {
+                "coordinates": [172.626974,-43.437789],
+                "type": "Point"},
+            "properties": {"id": "01S-0327-D/3.699"}}
+        ]};
+
+    L.geoJSON(locations).addTo(map);
 
 	tileLayer = L.tileLayer('http://tiles-a.data-cdn.linz.govt.nz/services;key=65003080689644b0bdd894704612b96f/tiles/v4/layer=53451/EPSG:3857/{z}/{x}/{y}.png', {
 		maxZoom: 22,
 		attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>'
 	}).addTo(map);
 
-    realtime.on('update', function() {
-        // map.fitBounds(realtime.getBounds(), {maxZoom: 20});
+    realtime.once('update', function() {
+        map.fitBounds(realtime.getBounds(), {maxZoom: 20});
     });
 
-    L.easyButton('fa-home', function(btn,map){
-        map.fitBounds(realtime.getBounds(), {maxZoom: 20});
-    },'Centre').addTo(map);
+    var options = {
+			measureControlTitleOn: 'Measure distance',   // Title for the control going to be switched on
+			measureControlTitleOff: 'Turn off', 		// Title for the control going to be switched off
+			measureControlLabel: '&#8614;',         // HTML to place inside the control
+			measureControlClasses: [],              // Classes to apply to the control
+			backgroundColor: '#8f8',                // Background color for control when selected
+			cursor: 'crosshair',                    // Cursor type to show when creating measurements
+			clearMeasurementsOnStop: true,          // Clear all the measurements when the control is unselected
+			showMeasurementsClearControl: true,    // Show a control to clear all the measurements
+			clearControlTitle: 'Clear Measurements',// Title text to show on the clear measurements control button
+			clearControlLabel: '&times',            // Clear control inner html
+			clearControlClasses: [],                // Collection of classes to add to clear control button
+			showUnitControl: false,                 // Show a control to change the units of measurements
+			tempLine: {                             // Styling settings for the temporary dashed line
+				color: '#00f',                      // Dashed line color
+				weight: 2                           // Dashed line weight
+			},
+			fixedLine: {                            // Styling for the solid line
+				color: '#000',                      // Solid line color
+				weight: 3                           // Solid line weight
+			},
+			startCircle: {                          // Style settings for circle marker indicating the starting point of the polyline
+				color: '#000',                      // Color of the border of the circle
+				weight: 1,                          // Weight of the circle
+				fillColor: '#0f0',                  // Fill color of the circle
+				fillOpacity: 1,                     // Fill opacity of the circle
+				radius: 3                           // Radius of the circle
+			},
+			intermedCircle: {                       // Style settings for all circle markers between startCircle and endCircle
+				color: '#000',                      // Color of the border of the circle
+				weight: 1,                          // Weight of the circle
+				fillColor: '#ff0',                  // Fill color of the circle
+				fillOpacity: 1,                     // Fill opacity of the circle
+				radius: 3                           // Radius of the circle
+			},
+			currentCircle: {                        // Style settings for circle marker indicating the latest point of the polyline during drawing a line
+				color: '#000',                      // Color of the border of the circle
+				weight: 1,                          // Weight of the circle
+				fillColor: '#f0f',                  // Fill color of the circle
+				fillOpacity: 1,                     // Fill opacity of the circle
+				radius: 3                           // Radius of the circle
+			},
+			endCircle: {                            // Style settings for circle marker indicating the last point of the polyline
+				color: '#000',                      // Color of the border of the circle
+				weight: 1,                          // Weight of the circle
+				fillColor: '#f00',                  // Fill color of the circle
+				fillOpacity: 1,                     // Fill opacity of the circle
+				radius: 3                           // Radius of the circle
+			},
+		};
 
+    L.control.polylineMeasure(options).addTo(map);
+
+
+    getGradientColor = function(start_color, end_color, percent) {
+        // strip the leading # if it's there
+        start_color = start_color.replace(/^\s*#|\s*$/g, '');
+        end_color = end_color.replace(/^\s*#|\s*$/g, '');
+
+        // convert 3 char codes --> 6, e.g. `E0F` --> `EE00FF`
+        if(start_color.length == 3){
+            start_color = start_color.replace(/(.)/g, '$1$1');
+        }
+
+        if(end_color.length == 3){
+            end_color = end_color.replace(/(.)/g, '$1$1');
+        }
+
+        // get colors
+        var start_red = parseInt(start_color.substr(0, 2), 16),
+            start_green = parseInt(start_color.substr(2, 2), 16),
+            start_blue = parseInt(start_color.substr(4, 2), 16);
+
+        var end_red = parseInt(end_color.substr(0, 2), 16),
+            end_green = parseInt(end_color.substr(2, 2), 16),
+            end_blue = parseInt(end_color.substr(4, 2), 16);
+
+        // calculate new color
+        var diff_red = end_red - start_red;
+        var diff_green = end_green - start_green;
+        var diff_blue = end_blue - start_blue;
+
+        diff_red = ( (diff_red * percent) + start_red ).toString(16).split('.')[0];
+        diff_green = ( (diff_green * percent) + start_green ).toString(16).split('.')[0];
+        diff_blue = ( (diff_blue * percent) + start_blue ).toString(16).split('.')[0];
+
+        // ensure 2 digits by color
+        if( diff_red.length == 1 ) diff_red = '0' + diff_red
+        if( diff_green.length == 1 ) diff_green = '0' + diff_green
+        if( diff_blue.length == 1 ) diff_blue = '0' + diff_blue
+
+        return '#' + diff_red + diff_green + diff_blue;
+    };
+    
 	</script>
 
 	</body>
