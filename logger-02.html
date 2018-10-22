@@ -75,87 +75,66 @@
 
 	<script>
 
-    var logger01_request = new Request('https://script.google.com/macros/s/AKfycbzWYaUGUMwq_chKdiZz43K279LhI4Uc21udxOJr0g0JECVkna4/exec',
-                                       {method: 'GET'});
-    var logger02_request = new Request('https://script.google.com/macros/s/AKfycbxw5-H2gOlRZztAw9WnTO6SS-WesH-rAPHN49kn9bJu3UC_4Io/exec',
-                                       {method: 'GET'});
-    var logger03_request = new Request('https://script.google.com/macros/s/AKfycbxB1CJ7OW9LoIRAv1bkLjX6_2InTnpBVTMuQBX12ytxMS3H9cE/exec',
-                                       {method: 'GET'});
+    var start_color = [51, 56, 144];
+    var mid_color = [254, 255, 198];
+    var end_color = [169, 0, 40];
 
-    var map = L.map('map'),
-    realtime = L.realtime(logger01_request, {
-        interval: 3 * 1000,
-        getFeatureId: function(f) {
-            return f.properties.datetime;
-        },
-        pointToLayer: function (feature, latlng) {
-			return L.circleMarker(latlng, {
-				radius: 14,
-				fillColor: getGradientColor('#FF0000', '#00FF00', feature.properties.t1/150),
-				color: "#000",
-				fillOpacity: 1,
-				weight: 1
-			})
-        }
-    }).addTo(map);
+    var map = L.map('map');
 
-    L.realtime(logger02_request, {
-        interval: 3 * 1000,
-        getFeatureId: function(f) {
-            return f.properties.datetime;
-        },
-        pointToLayer: function (feature, latlng) {
-			return L.circleMarker(latlng, {
-				radius: 14,
-				fillColor: getGradientColor('#FF0000', '#00FF00', feature.properties.t1/150),
-				color: "#999",
-				fillOpacity: 1,
-				weight: 1
-			})
-        }
-    }).addTo(map);
+    var request_url = ['https://temperature-loggers.onlosant.com/devices/5bcda90bea076f00083d0d53/latest'];
 
-    L.realtime(logger03_request, {
-        interval: 3 * 1000,
-        getFeatureId: function(f) {
-            return f.properties.datetime;
-        },
-        pointToLayer: function (feature, latlng) {
-			return L.circleMarker(latlng, {
-				radius: 14,
-				fillColor: getGradientColor('#FF0000', '#00FF00', feature.properties.t1/150),
-				color: "#FFF",
-				fillOpacity: 1,
-				weight: 1
-			})
-        }
-    }).addTo(map);
+    var realtime = [];
 
-    var locations = {
-        "type": "FeatureCollection",
-        "features": [
-            {"type": "Feature",
-             "geometry": {
-                "coordinates": [172.614662,-43.446155],
-                "type": "Point"},
-             "properties": {"id": "01S-0327-D/5.100"}},
-            {"type": "Feature",
-             "geometry": {
-                "coordinates": [172.626974,-43.437789],
-                "type": "Point"},
-            "properties": {"id": "01S-0327-D/3.699"}}
-        ]};
-
-    L.geoJSON(locations).addTo(map);
+    for (var j=0; j<request_url.length; j++) {
+        var myurl = request_url[j];
+        realtime.push(L.realtime(function(success,error) {
+                fetch(new Request(myurl, {method: 'GET'}))
+                    .then(function(response) {return response.json();})
+                    .then(function(data) {
+                        var t_all = [];
+                        for (var i=0; i<data.features.length; i++) {
+                            t_all.push(data.features[i].properties.t1);
+                        };
+                        t_min = Math.min(...t_all) - buffer;
+                        t_range = (Math.max(...t_all) + buffer) - t_min;
+                        success(data);
+                    })
+                    .catch(error);
+            }, {
+            interval: 10 * 1000,
+            getFeatureId: function(f) {
+                return f.properties.datetime;
+            },
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    radius: 14,
+                    fillColor: function (feature) {
+                        if (feature.properties.t1 < 0) {
+                            return '#000';
+                        } else {
+                            return getGradientColor(start_color, mid_color, end_color, (feature.properties.t1-t_min)/t_range);
+                        }
+                    },
+                    color: '#FFF',
+                    fillOpacity: 1,
+                    weight: 1
+                })
+            }
+        }).addTo(map));
+    }
 
 	tileLayer = L.tileLayer('http://tiles-a.data-cdn.linz.govt.nz/services;key=65003080689644b0bdd894704612b96f/tiles/v4/layer=53451/EPSG:3857/{z}/{x}/{y}.png', {
 		maxZoom: 22,
 		attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>'
 	}).addTo(map);
 
-    realtime.once('update', function() {
-        map.fitBounds(realtime.getBounds(), {maxZoom: 20});
+    realtime[0].on('update', function() {
+        map.fitBounds(realtime[0].getBounds(), {maxZoom: 21});
     });
+
+    var t_range = 150;
+    var t_min = 0;
+    var buffer = 1;
 
     var options = {
 			measureControlTitleOn: 'Measure distance',   // Title for the control going to be switched on
@@ -211,44 +190,21 @@
     L.control.polylineMeasure(options).addTo(map);
 
 
-    getGradientColor = function(start_color, end_color, percent) {
-        // strip the leading # if it's there
-        start_color = start_color.replace(/^\s*#|\s*$/g, '');
-        end_color = end_color.replace(/^\s*#|\s*$/g, '');
-
-        // convert 3 char codes --> 6, e.g. `E0F` --> `EE00FF`
-        if(start_color.length == 3){
-            start_color = start_color.replace(/(.)/g, '$1$1');
-        }
-
-        if(end_color.length == 3){
-            end_color = end_color.replace(/(.)/g, '$1$1');
-        }
-
-        // get colors
-        var start_red = parseInt(start_color.substr(0, 2), 16),
-            start_green = parseInt(start_color.substr(2, 2), 16),
-            start_blue = parseInt(start_color.substr(4, 2), 16);
-
-        var end_red = parseInt(end_color.substr(0, 2), 16),
-            end_green = parseInt(end_color.substr(2, 2), 16),
-            end_blue = parseInt(end_color.substr(4, 2), 16);
-
+    getGradientColor = function(start_color, mid_color, end_color, fraction) {
         // calculate new color
-        var diff_red = end_red - start_red;
-        var diff_green = end_green - start_green;
-        var diff_blue = end_blue - start_blue;
+        var color = Array.from(mid_color);
+        if (fraction < 0.5) {
+            for (var i=0; i<3; i++) {
+                color[i] = (mid_color[i] - start_color[i])*fraction + start_color[i];
+            }
+        } else if (fraction > 0.5) {
+            fraction = fraction - 0.5;
+            for (var i=0; i<3; i++) {
+                color[i] = (end_color[i] - mid_color[i])*fraction + mid_color[i];
+            }
+        }
 
-        diff_red = ( (diff_red * percent) + start_red ).toString(16).split('.')[0];
-        diff_green = ( (diff_green * percent) + start_green ).toString(16).split('.')[0];
-        diff_blue = ( (diff_blue * percent) + start_blue ).toString(16).split('.')[0];
-
-        // ensure 2 digits by color
-        if( diff_red.length == 1 ) diff_red = '0' + diff_red
-        if( diff_green.length == 1 ) diff_green = '0' + diff_green
-        if( diff_blue.length == 1 ) diff_blue = '0' + diff_blue
-
-        return '#' + diff_red + diff_green + diff_blue;
+        return 'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
     };
     
 	</script>
