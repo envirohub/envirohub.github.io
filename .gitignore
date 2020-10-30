@@ -1,2 +1,4 @@
 # .gitignore
 _site/
+hide/
+.vscode/settings.json
